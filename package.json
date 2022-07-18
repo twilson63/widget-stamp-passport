@@ -19,5 +19,8 @@
     "rollup-plugin-svelte": "^7.1.0",
     "svelte": "^3.49.0",
     "w3": "^2.0.2"
+  },
+  "dependencies": {
+    "ramda": "^0.28.0"
   }
 }

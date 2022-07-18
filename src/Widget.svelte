@@ -1,6 +1,9 @@
 <script>
+  import { getPOAPCount, hasPoaped, submitPoap } from './lib/poap.js'
+
   let contractId = null
-  let count = 0
+  let addr = null 
+  let count = 'N/A'
   
   // states
   const [NOT_CONNECTED, NO_CONTRACT_FOUND, CONNECTED_NO_POAP, ALREADY_POAPED, LOADING] = 
@@ -18,14 +21,20 @@
   const warp = window.warp.WarpWebFactory.memCached(arweave)
   const contract = warp(contractId)
   */
-  window.addEventListener('pageTransactionIdLoaded', () => {
+  window.addEventListener('pageTransactionIdLoaded', async () => {
     contractId = window.transactionId 
     state = NOT_CONNECTED
+    count = await getPOAPCount(contractId)
   })
 
-  window.addEventListener('arweaveWalletConnected', () => {
+  window.addEventListener('arweaveWalletConnected', async () => {
+    addr = await arweaveWallet.getActiveAddress()
     // check if POAPED!
     state = CONNECTED_NO_POAP
+    
+    if (await hasPoaped(contractId, addr)) {
+      state = ALREADY_POAPED
+    }
   })
 
   window.addEventListener('arweaveWalletDisconnected', () => {
@@ -35,6 +44,15 @@
 
   function equals(x, y) {
     return x === y
+  }
+
+  async function doPoap() {
+    // need the address and contract and call mint 
+    await submitPoap(contractId) 
+    if (await hasPoaped(contractId, addr)) {
+      state = ALREADY_POAPED
+    }
+    count = await getPOAPCount(contractId)
   }
 </script>
 <div class="p-16">
@@ -47,18 +65,23 @@
         <div class="stat-desc">Loading...</div>
       {:else if equals(state, NOT_CONNECTED)}
         <div class="stat-title">PoAP</div>
-        <div class="stat-value">XX</div>
+        <div class="stat-value">{count}</div>
         <div class="stat-desc">Not Connected</div>
       {:else if equals(state, NO_CONTRACT_FOUND)}
         <div class="stat-title">PoAP</div>
-        <div class="stat-value">XX</div>
+        <div class="stat-value">{count}</div>
         <div class="stat-desc">PoAP Contract not found!</div>
       {:else if equals(state, CONNECTED_NO_POAP)}
         <div class="stat-title">PoAP</div>
         <div class="stat-value">{count}</div>
         <div class="stat-desc">Number of PoAPs</div>
-        <button class="mt-4 btn btn-sm" on:click={() => null}>PoAP</button>
-        <button class="mt-4 btn btn-sm btn-info">View Stats</button>
+        <button class="mt-4 btn btn-sm" on:click={doPoap}>PoAP</button>
+        <button class="mt-4 btn btn-sm btn-info">View Details</button>
+      {:else if equals(state, ALREADY_POAPED)}
+        <div class="stat-title">PoAP</div>
+        <div class="stat-value">{count}</div>
+        <div class="stat-desc">Number of PoAPs</div>
+        <button class="mt-4 btn btn-sm btn-info">View Details</button>
       {/if}
     </div>
   </div>

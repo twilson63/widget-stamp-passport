@@ -7,7 +7,25 @@ const arweave = window.Arweave.init({
   protocol: 'https'
 })
 
+window.warp.LoggerFactory.INST.logLevel('error')
+
 const warp = window.warp.WarpWebFactory.memCached(arweave)
+
+export const hasPoaped = async (txId, addr) => {
+  const {result} = await warp.contract(txId).viewState({
+    function: 'balance',
+    target: addr
+  })
+  console.log(result)
+  return result.balance === 1 ? true : false 
+}
+
+export const submitPoap = async (txId) => {
+  return warp.contract(txId).connect('use_wallet')
+    .bundleInteraction({
+      function: 'mint'
+    })
+}
 
 // get poap count
 export const getPOAPCount = async (txId) => {

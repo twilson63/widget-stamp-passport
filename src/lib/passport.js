@@ -35,13 +35,13 @@ export const getStampCount = async (txId) => {
 }
 
 // get passport most recent 100
-export const getPassports = async (txId) => {
+export const getStamps = async (txId) => {
   const contract = warp.contract(txId)
   const { state } = await contract.readState()
-  const profiles = await Promise.all(
-    map(getProfile, take(100, Object.keys(state.balances)))
-  )
-
+  // const profiles = await Promise.all(
+  //   map(getProfile, take(100, Object.keys(state.balances)))
+  // )
+  return Object.keys(state.balances)
 }
 
 // get stamps for current visitor most recent 100
@@ -64,7 +64,13 @@ query {
   }
 }
   `})
-    .then(({data}) => data.data.transactions.edges[0].node.tags.find(({name}) => name === 'Profile-Title').value )
+    .then(({data}) => {
+      try {
+        return data.data.transactions.edges[0].node.tags.find(({name}) => name === 'Profile-Title')?.value 
+      } catch (e) {
+        return 'unknown'
+      }
+    })
 
     
 

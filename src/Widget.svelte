@@ -1,11 +1,17 @@
 <script>
-  import { getPassports, getStampCount, hasStamped, stamp } from './lib/passport.js'
+  import { getStamps, getStampCount, hasStamped, stamp } from './lib/passport.js'
   import Modal from './components/modal.svelte'
-
+  
   let contractId = null
   let addr = null 
   let count = 'N/A'
   let detailsDialog = false
+  let alreadyStamped = true
+  let stampingDialog = false
+  let stamps = []
+
+  const [STAMPS, MY_PASSPORT, MY_POINTS] = ['stamps', 'my_passport', 'my_points']
+  let activeTab = STAMPS
   
   // states
   const [NOT_CONNECTED, NO_CONTRACT_FOUND, CONNECTED_NO_POAP, ALREADY_POAPED, LOADING] = 
@@ -13,20 +19,13 @@
   
   let state = !contractId ? NO_CONTRACT_FOUND : NOT_CONNECTED
 
-  /*
-  const arweave = window.Arweave.init({
-    host: 'arweave.net',
-    port: 443,
-    protocol: 'https'
-  })
-
-  const warp = window.warp.WarpWebFactory.memCached(arweave)
-  const contract = warp(contractId)
-  */
   window.addEventListener('pageTransactionIdLoaded', async () => {
     contractId = window.transactionId 
     state = NOT_CONNECTED
-    count = await getStampCount(contractId)
+    //count = await getStampCount(contractId)
+    stamps = await getStamps(contractId)
+    count = stamps.length
+
   })
 
   window.addEventListener('arweaveWalletConnected', async () => {
@@ -36,6 +35,8 @@
     
     if (await hasStamped(contractId, addr)) {
       state = ALREADY_POAPED
+    } else {
+      alreadyStamped = false
     }
   })
 
@@ -49,12 +50,19 @@
   }
 
   async function doStamp() {
+    alreadyStamped = true
+    stampingDialog = true 
     // need the address and contract and call mint 
     await stamp(contractId) 
     if (await hasStamped(contractId, addr)) {
       state = ALREADY_POAPED
     }
     count = await getStampCount(contractId)
+    stampingDialog = false
+  }
+
+  function changeTab(tab) {
+    activeTab = tab 
   }
 </script>
 <div class="p-16">
@@ -62,36 +70,49 @@
     
     <div class="stat">
       {#if equals(state, LOADING)}
-        
-        <div class="stat-value">XX</div>
+        <div class="stat-value text-center">XX</div>
         <div class="stat-desc">Loading...</div>
+        <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
+        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
       {:else if equals(state, NOT_CONNECTED)}
-        
-        <div class="stat-value">{count}</div>
+        <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Not Connected</div>
+        <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
+        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
       {:else if equals(state, NO_CONTRACT_FOUND)}
-       
-        <div class="stat-value">{count}</div>
-        <div class="stat-desc">Passport Contract not found!</div>
+        <div class="stat-value text-center">{count}</div>
+        <div class="stat-desc">Not Found</div>
+        <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
+        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
       {:else if equals(state, CONNECTED_NO_POAP)}
-        
-        <div class="stat-value">{count}</div>
+        <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Passports Stamped</div>
-        <button class="mt-4 btn btn-sm" on:click={doStamp}>Stamp</button>
-        <button class="mt-4 btn btn-sm btn-info" on:click={() => detailsDialog = true}>View Details</button>
+        <button class="mt-4 btn btn-sm" disabled={alreadyStamped} on:click={doStamp}>Stamp</button>
+        <button class="mt-4 btn btn-sm btn-info" on:click={() => detailsDialog = true}>Details</button>
       {:else if equals(state, ALREADY_POAPED)}
-       
-        <div class="stat-value">{count}</div>
+        <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Passports Stamped</div>
-        <button class="mt-4 btn btn-sm btn-info" on:click={() => detailsDialog = true}>View Details</button>
+        <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
+        <button class="mt-4 btn btn-sm btn-info" on:click={() => detailsDialog = true}>Details</button>
       {/if}
     </div>
   </div>
 </div>
 <Modal open={detailsDialog} on:click={() => detailsDialog = false}>
-  <h3>Details</h3>
-  <div class="tabs">
-    <a class="tab">Passports Stamped</a>
-    <a class="tab">My Passport View</a>
+  <h3 class="text-lg">Details</h3>
+  <div class="mt-4 tabs">
+    <button class="tab" on:click={() => changeTab(STAMPS) }>Stamps</button>
+    <!--
+    <button class="tab" on:click={() => changeTab(MY_PASSPORT) }>My Passport</button>
+    <button class="tab" on:click={() => changeTab(MY_POINTS) }>My Points</button>
+    -->
   </div>
+  {#if equals(activeTab, STAMPS)}
+    {#each stamps as stamp}
+      <div>{stamp}</div>
+    {/each}
+  {/if}
+</Modal>
+<Modal open={stampingDialog} ok={false}>
+  <h3 class="text-lg text-center">Stamping Passport</h3>
 </Modal>

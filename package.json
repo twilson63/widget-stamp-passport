@@ -1,7 +1,7 @@
 {
-  "name": "widget-poap",
+  "name": "widget-stamp",
   "version": "0.0.1",
-  "description": "PoAP Widget for Permapages",
+  "description": "Permapage Passport Widget Stamp tool",
   "main": "dist/widget.js",
   "scripts": {
     "build": "rollup -c",

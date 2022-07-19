@@ -11,7 +11,7 @@ window.warp.LoggerFactory.INST.logLevel('error')
 
 const warp = window.warp.WarpWebFactory.memCached(arweave)
 
-export const hasPoaped = async (txId, addr) => {
+export const hasStamped = async (txId, addr) => {
   const {result} = await warp.contract(txId).viewState({
     function: 'balance',
     target: addr
@@ -20,22 +20,22 @@ export const hasPoaped = async (txId, addr) => {
   return result.balance === 1 ? true : false 
 }
 
-export const submitPoap = async (txId) => {
+export const stamp = async (txId) => {
   return warp.contract(txId).connect('use_wallet')
     .bundleInteraction({
       function: 'mint'
     })
 }
 
-// get poap count
-export const getPOAPCount = async (txId) => {
+// get stamp count
+export const getStampCount = async (txId) => {
   const contract = warp.contract(txId)
   const { state } = await contract.readState()
   return Object.keys(state.balances).length
 }
 
-// get poap vistors most recent 100
-export const getPOAPVisitors = async (txId) => {
+// get passport most recent 100
+export const getPassports = async (txId) => {
   const contract = warp.contract(txId)
   const { state } = await contract.readState()
   const profiles = await Promise.all(
@@ -44,7 +44,7 @@ export const getPOAPVisitors = async (txId) => {
 
 }
 
-// get poap pages by visitor most recent 100
+// get stamps for current visitor most recent 100
 
 
 async function getProfile(addr) {

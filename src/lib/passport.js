@@ -1,6 +1,8 @@
 import map from 'ramda/src/map'
 import take from 'ramda/src/take'
 
+let defaultAvatar = 'https://social-icons.arweave.dev/avatar.svg'
+
 const arweave = window.Arweave.init({
   host: 'arweave.net',
   port: 443,
@@ -38,10 +40,11 @@ export const getStampCount = async (txId) => {
 export const getStamps = async (txId) => {
   const contract = warp.contract(txId)
   const { state } = await contract.readState()
-  // const profiles = await Promise.all(
-  //   map(getProfile, take(100, Object.keys(state.balances)))
-  // )
-  return Object.keys(state.balances)
+  const profiles = await Promise.all(
+    map(getProfile, take(100, Object.keys(state.balances)))
+  )
+  return profiles
+  //return Object.keys(state.balances)
 }
 
 // get stamps for current visitor most recent 100
@@ -66,9 +69,19 @@ query {
   `})
     .then(({data}) => {
       try {
-        return data.data.transactions.edges[0].node.tags.find(({name}) => name === 'Profile-Title')?.value 
+        const node = data.data.transactions.edges[0].node
+        const avatar = node.tags.find(({name}) => name === 'Profile-Avatar' )?.value || defaultAvatar
+        return {
+          id: node.id,
+          name: node.tags.find(({name}) => name === 'Profile-Name')?.value,
+          avatar
+        }
       } catch (e) {
-        return 'unknown'
+        return {
+          id: 0,
+          name: 'unknown',
+          avatar: defaultAvatar
+        }
       }
     })
 

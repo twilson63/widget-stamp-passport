@@ -1,7 +1,8 @@
 <script>
   import { getStamps, getStampCount, hasStamped, stamp } from './lib/passport.js'
   import Modal from './components/modal.svelte'
-  
+  import Logo from './components/logo.svelte'
+
   let contractId = null
   let addr = null 
   let count = 'N/A'
@@ -69,21 +70,25 @@
   <div class="stats bg-primary text-primary-content">
     
     <div class="stat">
+      <div class="stat-title">
+        <Logo />
+        Stamps
+      </div>
       {#if equals(state, LOADING)}
         <div class="stat-value text-center">XX</div>
         <div class="stat-desc">Loading...</div>
         <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
-        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
+        <a href="https://arweave.net/LcGsQmsLuGBqDBSvQdlDYVDRb6DXB4OfZPSfluyEGLU" class="mt-4 btn btn-sm btn-info">Learn More</a>
       {:else if equals(state, NOT_CONNECTED)}
         <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Not Connected</div>
         <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
-        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
+        <a href="https://arweave.net/LcGsQmsLuGBqDBSvQdlDYVDRb6DXB4OfZPSfluyEGLU" class="mt-4 btn btn-sm btn-info">Learn More</a>
       {:else if equals(state, NO_CONTRACT_FOUND)}
         <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Not Found</div>
         <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
-        <button class="mt-4 btn btn-sm btn-info">Learn More</button>
+        <a href="https://arweave.net/LcGsQmsLuGBqDBSvQdlDYVDRb6DXB4OfZPSfluyEGLU" class="mt-4 btn btn-sm btn-info">Learn More</a>
       {:else if equals(state, CONNECTED_NO_POAP)}
         <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Passports Stamped</div>
@@ -108,9 +113,21 @@
     -->
   </div>
   {#if equals(activeTab, STAMPS)}
+    <ul>
     {#each stamps as stamp}
-      <div>{stamp}</div>
+      <li class="flex space-x-2 my-4">
+        <div class="avatar flex-none">
+          <div class="w-8 mask mask-squircle">
+            <img src={stamp.avatar} alt={stamp.name} />
+          </div>
+        </div>
+        <div class="flex-1">{stamp.name}</div>
+        <div class="flex-none">
+          <a href="https://profiles.arweave.dev/?txId={stamp.id}">[View Profile]</a>
+        </div>
+      </li>
     {/each}
+    </ul>
   {/if}
 </Modal>
 <Modal open={stampingDialog} ok={false}>

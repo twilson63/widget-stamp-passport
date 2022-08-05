@@ -1,7 +1,7 @@
 {
-  "name": "widget-stamp",
-  "version": "0.0.1",
-  "description": "Permapage Passport Widget Stamp tool",
+  "name": "passport",
+  "version": "0.0.2",
+  "description": "Permapage Passport Widget",
   "main": "dist/widget.js",
   "scripts": {
     "build": "rollup -c",

@@ -1,6 +1,6 @@
 import Widget from './Widget.svelte'
 
-const el = document.getElementById('widget-poap')
+const el = document.getElementById('passport')
 //const dataset = el.dataset
 
 

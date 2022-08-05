@@ -12,7 +12,6 @@
   let contractId = null;
   let addr = null;
   let count = "N/A";
-  let detailsDialog = false;
   let alreadyStamped = true;
   let stampingDialog = false;
   let stamps = [];
@@ -71,6 +70,7 @@
     if (await hasStamped(contractId, addr)) {
       state = ALREADY_POAPED;
     }
+    // need to wait some time here before checking...
     count = await getStampCount(contractId);
     stampingDialog = false;
   }
@@ -80,7 +80,7 @@
   }
 </script>
 
-<div class="p-16">
+<div class="p-8">
   <div class="stats bg-primary text-primary-content">
     <div class="stat">
       <div class="stat-title">
@@ -137,35 +137,7 @@
     </div>
   </div>
 </div>
-<Modal open={detailsDialog} on:click={() => (detailsDialog = false)}>
-  <h3 class="text-lg">Details</h3>
-  <div class="mt-4 tabs">
-    <button class="tab" on:click={() => changeTab(STAMPS)}>Stamps</button>
-    <!--
-    <button class="tab" on:click={() => changeTab(MY_PASSPORT) }>My Passport</button>
-    <button class="tab" on:click={() => changeTab(MY_POINTS) }>My Points</button>
-    -->
-  </div>
-  {#if equals(activeTab, STAMPS)}
-    <ul>
-      {#each stamps as stamp}
-        <li class="flex space-x-2 my-4">
-          <div class="avatar flex-none">
-            <div class="w-8 mask mask-squircle">
-              <img src={stamp.avatar} alt={stamp.name} />
-            </div>
-          </div>
-          <div class="flex-1">{stamp.name}</div>
-          <div class="flex-none">
-            <a href="https://profiles.arweave.dev/?txId={stamp.id}"
-              >[View Profile]</a
-            >
-          </div>
-        </li>
-      {/each}
-    </ul>
-  {/if}
-</Modal>
+
 <Modal open={stampingDialog} ok={false}>
   <h3 class="text-lg text-center">Stamping Passport</h3>
 </Modal>

@@ -36,7 +36,6 @@ export const getStampCount = async (txId) => {
   const { state } = await contract.setEvaluationOptions({
     allowUnsafeClient: true
   }).readState()
-  console.log(state)
   return Object.values(state.stamps).filter(s => s.asset === txId).length
 }
 

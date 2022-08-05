@@ -1,5 +1,6 @@
 {
   "name": "passport",
+  "version": "0.0.4",
   "description": "Permapage Passport Widget",
   "main": "dist/widget.js",
   "scripts": {

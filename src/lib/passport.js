@@ -8,30 +8,34 @@ const arweave = window.Arweave.init({
 })
 
 window.warp.LoggerFactory.INST.logLevel('error')
-
+const STAMPCOIN = '9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
 const warp = window.warp.WarpWebFactory.memCached(arweave)
 
 export const hasStamped = async (txId, addr) => {
-  const {result} = await warp.contract(txId).viewState({
-    function: 'balance',
-    target: addr
-  })
-  console.log(result)
-  return result.balance === 1 ? true : false 
+  const { state } = await warp.contract(STAMPCOIN)
+    .setEvaluationOptions({
+      allowUnsafeClient: true
+    })
+    .readState()
+  return Object.values(state.stamps).find(s => s.address === addr) ? true : false
 }
 
 export const stamp = async (txId) => {
-  return warp.contract(txId).connect('use_wallet')
+  return warp.contract(STAMPCOIN).connect('use_wallet')
     .bundleInteraction({
-      function: 'mint'
+      function: 'stamp',
+      transactionId: txId
     })
 }
 
 // get stamp count
 export const getStampCount = async (txId) => {
-  const contract = warp.contract(txId)
-  const { state } = await contract.readState()
-  return Object.keys(state.balances).length
+  const contract = warp.contract(STAMPCOIN)
+  const { state } = await contract.setEvaluationOptions({
+    allowUnsafeClient: true
+  }).readState()
+  console.log(state)
+  return Object.values(state.stamps).filter(s => s.asset === txId).length
 }
 
 // get passport most recent 100
@@ -49,7 +53,8 @@ export const getStamps = async (txId) => {
 
 async function getProfile(addr) {
   // get profile
-  return arweave.api.post('graphql', { query: `
+  return arweave.api.post('graphql', {
+    query: `
 query {
   transactions(first: 1, owners: ["${addr}"], tags: {name: "Protocol", values: ["PermaProfile-v0.1"]}) {
     edges {
@@ -64,14 +69,14 @@ query {
   }
 }
   `})
-    .then(({data}) => {
+    .then(({ data }) => {
       try {
-        return data.data.transactions.edges[0].node.tags.find(({name}) => name === 'Profile-Title')?.value 
+        return data.data.transactions.edges[0].node.tags.find(({ name }) => name === 'Profile-Title')?.value
       } catch (e) {
         return 'unknown'
       }
     })
 
-    
+
 
 }

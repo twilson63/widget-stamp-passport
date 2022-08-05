@@ -1,6 +1,6 @@
 {
   "name": "widget-stamp",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Permapage Passport Widget Stamp tool",
   "main": "dist/widget.js",
   "scripts": {

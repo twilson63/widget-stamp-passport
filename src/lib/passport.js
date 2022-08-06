@@ -19,7 +19,7 @@ export const hasStamped = async (txId, addr) => {
       allowUnsafeClient: true
     })
     .readState()
-  return Object.values(state.stamps).find(s => s.address === addr) ? true : false
+  return Object.values(state.stamps).find(s => (s.address === addr && s.asset === txId)) ? true : false
 }
 
 export const stamp = async (txId) => {

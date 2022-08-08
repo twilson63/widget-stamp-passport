@@ -4,6 +4,7 @@
     getStampCount,
     hasStamped,
     stamp,
+    checkVouched,
   } from "./lib/passport.js";
   import Modal from "./components/modal.svelte";
   import Logo from "./components/logo.svelte";
@@ -12,9 +13,11 @@
   let contractId = null;
   let addr = null;
   let count = "N/A";
-  let alreadyStamped = true;
+  let alreadyStamped = false;
   let stampingDialog = false;
   let stamps = [];
+  let notVouchedDialog = false;
+  let alreadyStampedDialog = false;
 
   // states
   const [
@@ -35,7 +38,7 @@
 
   window.addEventListener("pageTransactionIdLoaded", async () => {
     contractId = window.transactionId;
-    state = NOT_CONNECTED;
+    state = CONNECTED_NO_POAP;
     count = await getStampCount(contractId);
     //stamps = await getStamps(contractId);
     //count = stamps.length;
@@ -48,8 +51,10 @@
 
     if (await hasStamped(contractId, addr)) {
       state = ALREADY_POAPED;
+      alreadyStampedDialog = true;
     } else {
-      alreadyStamped = false;
+      doStamp();
+      //alreadyStamped = false;
     }
   });
 
@@ -64,12 +69,27 @@
 
   async function doStamp() {
     alreadyStamped = true;
-    stampingDialog = true;
-    // need the address and contract and call mint
-    await stamp(contractId);
-    if (await hasStamped(contractId, addr)) {
-      state = ALREADY_POAPED;
+    if (!addr) {
+      const e = new Event("walletConnect");
+      window.dispatchEvent(e);
+      return;
     }
+
+    const vouched = await checkVouched(addr);
+    if (vouched) {
+      if (await hasStamped(addr)) {
+        alreadyStampedDialog = true;
+        return;
+      }
+      stampingDialog = true;
+      await stamp(contractId);
+      state = ALREADY_POAPED;
+    } else {
+      notVouchedDialog = true;
+      alreadyStamped = false;
+      state = CONNECTED_NO_POAP;
+    }
+
     // need to wait some time here before checking...
     count = await getStampCount(contractId);
     stampingDialog = false;
@@ -140,4 +160,30 @@
 
 <Modal open={stampingDialog} ok={false}>
   <h3 class="text-lg text-center">Stamping Passport</h3>
+</Modal>
+<Modal open={notVouchedDialog} ok={false}>
+  <h3 class="text-2xl font-bold">Get Vouched</h3>
+  <p class="my-8 text-lg">
+    In order to stamp in the Web of Value, you need to get Vouched by a service
+    from VouchDAO
+  </p>
+  <div class="w-full flex justify-center">
+    <a
+      href="https://vouchdao.xyz"
+      target="_blank"
+      class="btn btn-secondary"
+      on:click={() => {
+        notVouchedDialog = false;
+        state = CONNECTED_NO_POAP;
+      }}>Go to VouchDAO</a
+    >
+  </div>
+</Modal>
+
+<Modal
+  open={alreadyStampedDialog}
+  on:click={() => (alreadyStampedDialog = false)}
+>
+  <h3 class="text-2xl font-bold">Already Stamped</h3>
+  <p class="my-8 text-lg">Looks like you have already stamped this page!</p>
 </Modal>

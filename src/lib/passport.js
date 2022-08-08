@@ -2,6 +2,7 @@ import map from 'ramda/src/map'
 import take from 'ramda/src/take'
 
 let defaultAvatar = 'https://social-icons.arweave.dev/avatar.svg'
+let stamps = null
 
 const arweave = window.Arweave.init({
   host: 'arweave.net',
@@ -13,13 +14,34 @@ window.warp.LoggerFactory.INST.logLevel('error')
 const STAMPCOIN = '9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
 const warp = window.warp.WarpWebFactory.memCached(arweave)
 
+export const checkVouched = async (addr) => {
+  const result = await arweave.api.post('graphql', {
+    query: `
+query {
+  transactions(tags: {name: "Vouch-For", values: ["${addr}"]}) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}
+  `})
+  const nodes = result.data?.data?.transactions?.edges || []
+  return nodes.length > 0 ? true : false
+}
+
 export const hasStamped = async (txId, addr) => {
-  const { state } = await warp.contract(STAMPCOIN)
-    .setEvaluationOptions({
-      allowUnsafeClient: true
-    })
-    .readState()
-  return Object.values(state.stamps).find(s => (s.address === addr && s.asset === txId)) ? true : false
+  if (!stamps) {
+    const { state } = await warp.contract(STAMPCOIN)
+      .setEvaluationOptions({
+        allowUnsafeClient: true
+      })
+      .readState()
+    stamps = Object.values(state.stamps).filter(s => s.asset === txId)
+  }
+
+  return stamps.find(s => (s.address === addr && s.asset === txId)) ? true : false
 }
 
 export const stamp = async (txId) => {
@@ -36,7 +58,8 @@ export const getStampCount = async (txId) => {
   const { state } = await contract.setEvaluationOptions({
     allowUnsafeClient: true
   }).readState()
-  return Object.values(state.stamps).filter(s => s.asset === txId).length
+  stamps = Object.values(state.stamps).filter(s => s.asset === txId)
+  return stamps.length
 }
 
 // get passport most recent 100

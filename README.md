@@ -13,12 +13,10 @@ PoAP stands for Proof of Attention Protocol; A PoAP is a way for a user to prove
 
 ```sh
 <script src="https://arweave.net/XXXXXXXXXX"></script>
-<div id="widget-poap"></div>
+<div id="passport"></div>
 ```
 
 > NOTE: This widget depends on the Connector Widget - https://github.com/twilson63/widget-connector
-
-
 
 ## Build Widget
 

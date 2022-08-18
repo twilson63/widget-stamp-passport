@@ -9,8 +9,10 @@
   import Modal from "./components/modal.svelte";
   import Logo from "./components/logo.svelte";
 
+  export let asset = null;
+
   let url = "https://stamp.arweave.dev";
-  let contractId = null;
+
   let addr = null;
   let count = "N/A";
   let alreadyStamped = false;
@@ -34,14 +36,16 @@
     "Loading...",
   ];
 
-  let state = !contractId ? NO_CONTRACT_FOUND : NOT_CONNECTED;
+  let state = !asset ? NO_CONTRACT_FOUND : NOT_CONNECTED;
+
+  if (asset) {
+    getStampCount(asset).then((c) => (count = c));
+  }
 
   window.addEventListener("pageTransactionIdLoaded", async () => {
-    contractId = window.transactionId;
+    asset = window.transactionId;
     state = CONNECTED_NO_POAP;
-    count = await getStampCount(contractId);
-    //stamps = await getStamps(contractId);
-    //count = stamps.length;
+    count = await getStampCount(asset);
   });
 
   window.addEventListener("arweaveWalletConnected", async () => {
@@ -49,7 +53,7 @@
     // check if POAPED!
     state = CONNECTED_NO_POAP;
 
-    if (await hasStamped(contractId, addr)) {
+    if (await hasStamped(asset, addr)) {
       state = ALREADY_POAPED;
       alreadyStampedDialog = true;
     } else {
@@ -77,12 +81,12 @@
 
     const vouched = await checkVouched(addr);
     if (vouched) {
-      if (await hasStamped(addr)) {
+      if (await hasStamped(asset, addr)) {
         alreadyStampedDialog = true;
         return;
       }
       stampingDialog = true;
-      await stamp(contractId);
+      await stamp(asset);
       state = ALREADY_POAPED;
     } else {
       notVouchedDialog = true;
@@ -91,7 +95,7 @@
     }
 
     // need to wait some time here before checking...
-    count = await getStampCount(contractId);
+    count = await getStampCount(asset);
     stampingDialog = false;
   }
 

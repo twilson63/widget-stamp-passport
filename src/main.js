@@ -1,9 +1,10 @@
 import Widget from './Widget.svelte'
 
 const el = document.getElementById('passport')
-//const dataset = el.dataset
+const dataset = Object.assign({}, el.dataset)
 
 
 const widget = new Widget({
-  target: el
+  target: el,
+  props: dataset
 })

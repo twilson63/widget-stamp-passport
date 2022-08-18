@@ -1,7 +1,7 @@
 {
   "name": "passport",
-  "version": "0.0.7",
-  "description": "Permapage Passport Widget",
+  "version": "0.0.8",
+  "description": "Permapage Stamp Widget",
   "main": "dist/widget.js",
   "scripts": {
     "build": "rollup -c",

@@ -11,8 +11,20 @@ const arweave = window.Arweave.init({
 })
 
 window.warp.LoggerFactory.INST.logLevel('error')
+const CACHE = 'https://cache.permapages.app/9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
 const STAMPCOIN = '9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
 const warp = window.warp.WarpWebFactory.memCached(arweave)
+
+async function getState() {
+  return await fetch(CACHE).then((res) => res.json())
+    .catch(_ => warp.contract(STAMPCOIN)
+      .setEvaluationOptions({
+        allowUnsafeClient: true
+      })
+      .readState()
+      .then(result => result.state)
+    )
+}
 
 export const checkVouched = async (addr) => {
   const result = await arweave.api.post('graphql', {
@@ -33,11 +45,7 @@ query {
 
 export const hasStamped = async (txId, addr) => {
   if (!stamps) {
-    const { state } = await warp.contract(STAMPCOIN)
-      .setEvaluationOptions({
-        allowUnsafeClient: true
-      })
-      .readState()
+    const state = await getState()
     stamps = Object.values(state.stamps).filter(s => s.asset === txId)
   }
 
@@ -54,18 +62,14 @@ export const stamp = async (txId) => {
 
 // get stamp count
 export const getStampCount = async (txId) => {
-  const contract = warp.contract(STAMPCOIN)
-  const { state } = await contract.setEvaluationOptions({
-    allowUnsafeClient: true
-  }).readState()
+  const state = await getState()
   stamps = Object.values(state.stamps).filter(s => s.asset === txId)
   return stamps.length
 }
 
 // get passport most recent 100
 export const getStamps = async (txId) => {
-  const contract = warp.contract(txId)
-  const { state } = await contract.readState()
+  const state = await getState()
   const profiles = await Promise.all(
     map(getProfile, take(100, Object.keys(state.balances)))
   )

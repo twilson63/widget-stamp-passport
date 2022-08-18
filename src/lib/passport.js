@@ -56,7 +56,8 @@ export const stamp = async (txId) => {
   return warp.contract(STAMPCOIN).connect('use_wallet')
     .bundleInteraction({
       function: 'stamp',
-      transactionId: txId
+      transactionId: txId,
+      timestamp: Date.now()
     })
 }
 

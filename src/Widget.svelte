@@ -1,6 +1,7 @@
 <script>
   import {
     getStamps,
+    getAsset,
     getStampCount,
     hasStamped,
     stamp,
@@ -10,8 +11,10 @@
   import Logo from "./components/logo.svelte";
 
   export let asset = null;
+  export let code = null;
+  export let author = null;
 
-  let url = "https://stamp.arweave.dev";
+  let url = "https://stamps.arweave.dev";
 
   let addr = null;
   let count = "N/A";
@@ -40,6 +43,14 @@
 
   if (asset) {
     getStampCount(asset).then((c) => (count = c));
+  } else if (author && code) {
+    getAsset(author, code)
+      .then((x) => (console.log("asset", x), x))
+      .then(getStampCount)
+      .then((c) => (count = c))
+      .catch((e) =>
+        console.log("Could not locate asset using code and author")
+      );
   }
 
   window.addEventListener("pageTransactionIdLoaded", async () => {

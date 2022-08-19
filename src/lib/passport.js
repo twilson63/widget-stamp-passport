@@ -26,6 +26,30 @@ async function getState() {
     )
 }
 
+export const getAsset = async (author, code) => {
+  const result = await arweave.api.post('graphql', {
+    query: `
+query {
+  transactions(owners: ["${author}"], 
+    tags: [
+      {name:"Type", values:["PermaWebPage"]},
+      {name: "Page-Code", values: ["${code}"]}
+    ]
+  ) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}
+  `})
+
+  const nodes = result.data?.data?.transactions?.edges || []
+  return nodes.length > 0 ? nodes[0].node.id : null
+
+}
+
 export const checkVouched = async (addr) => {
   const result = await arweave.api.post('graphql', {
     query: `

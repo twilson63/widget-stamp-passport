@@ -177,7 +177,7 @@
   </div>
 </div>
 
-<Modal open={stampingDialog} ok={false}>
+<Modal open={stampingDialog} ok={false} cancel={false}>
   <h3 class="text-lg text-center">Stamping Passport</h3>
 </Modal>
 <Modal open={notVouchedDialog} ok={false}>
@@ -201,7 +201,7 @@
 
 <Modal
   open={alreadyStampedDialog}
-  on:click={() => (alreadyStampedDialog = false)}
+  on:cancel={() => (alreadyStampedDialog = false)}
 >
   <h3 class="text-2xl font-bold">Already Stamped</h3>
   <p class="my-8 text-lg">Looks like you have already stamped this page!</p>

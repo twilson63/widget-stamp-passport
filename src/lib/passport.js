@@ -11,8 +11,8 @@ const arweave = window.Arweave.init({
 })
 
 window.warp.LoggerFactory.INST.logLevel('error')
-const CACHE = 'https://cache.permapages.app/9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
-const STAMPCOIN = '9nDWI3eHrMQbrfs9j8_YPfLbYJmBodgn7cBCG8bii4o'
+const CACHE = 'https://cache.permapages.app/aSMILD7cEJr93i7TAVzzMjtci_sGkXcWnqpDkG6UGcA'
+const STAMPCOIN = 'aSMILD7cEJr93i7TAVzzMjtci_sGkXcWnqpDkG6UGcA'
 const warp = window.warp.WarpWebFactory.memCached(arweave)
 
 async function getState() {
@@ -27,24 +27,25 @@ async function getState() {
 }
 
 export const getAsset = async (author, code) => {
-  const result = await arweave.api.post('graphql', {
-    query: `
-query {
-  transactions(owners: ["${author}"], 
-    tags: [
-      {name:"Type", values:["PermaWebPage"]},
-      {name: "Page-Code", values: ["${code}"]}
-    ]
-  ) {
-    edges {
-      node {
-        id
+  const query = `
+  query {
+    transactions(owners: ["${author}"], 
+      tags: [
+        {name:"Type", values:["PermaWebPage", "page"]},
+        {name: "Page-Code", values: ["${code}"]}
+      ]
+    ) {
+      edges {
+        node {
+          id
+        }
       }
     }
   }
-}
-  `})
-
+    `
+  const result = await arweave.api.post('graphql', {
+    query
+  })
   const nodes = result.data?.data?.transactions?.edges || []
   return nodes.length > 0 ? nodes[0].node.id : null
 

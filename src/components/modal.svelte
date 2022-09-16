@@ -1,35 +1,28 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { rnd } from '../lib/utils.js'
-    
-  export let id = rnd(20, rnd.alphaLower)
+
+  export let id = window.crypto.randomUUID();
   export let open = false;
-  export let ok = true;
-  export let cancel = false;
+  export let cancel = true;
+  export let bgColor = "";
+  export let border = "";
 
   const dispatch = createEventDispatcher();
 
-  function okClick() {
-    open = false;
-    dispatch("click");
-  }
   function cancelClick() {
     dispatch("cancel");
   }
-    
 </script>
 
 <input type="checkbox" {id} bind:checked={open} class="modal-toggle" />
 <div class="modal">
-  <div class="modal-box">
-    <slot />
-    {#if ok}
-      <div class="modal-action">
-        <button class="btn" on:click={okClick}>OK</button>
-        {#if cancel}
-          <button class="btn btn-outline" on:click={cancelClick}>Cancel</button>
-        {/if}
-      </div>
+  <div class="modal-box  {bgColor} {border}">
+    {#if cancel}
+      <button
+        on:click={cancelClick}
+        class="btn btn-sm btn-circle absolute right-2 top-2">✕</button
+      >
     {/if}
+    <slot />
   </div>
 </div>

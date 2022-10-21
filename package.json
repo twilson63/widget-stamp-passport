@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Stamp Widget",
   "main": "dist/widget.js",
   "scripts": {

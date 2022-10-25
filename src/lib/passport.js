@@ -11,8 +11,8 @@ const arweave = window.Arweave.init({
 })
 
 window.warp.LoggerFactory.INST.logLevel('error')
-const CACHE = 'https://cache.permapages.app/jAE_V6oXkb0dohIOjReMhrTlgLW0X2j3rxIZ5zgbjXw'
-const STAMPCOIN = 'jAE_V6oXkb0dohIOjReMhrTlgLW0X2j3rxIZ5zgbjXw'
+const CACHE = 'https://cache.permapages.app/FMRHYgSijiUNBrFy-XqyNNXenHsCV0ThR4lGAPO4chA'
+const STAMPCOIN = 'FMRHYgSijiUNBrFy-XqyNNXenHsCV0ThR4lGAPO4chA'
 const warp = window.warp.WarpWebFactory.memCached(arweave)
 
 async function getState() {

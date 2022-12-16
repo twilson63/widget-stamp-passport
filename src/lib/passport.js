@@ -32,7 +32,7 @@ export const getAsset = async (author, code) => {
   query {
     transactions(owners: ["${author}"], 
       tags: [
-        {name:"Type", values:["PermaWebPage", "page"]},
+        {name:"Type", values:["PermaWebPage", "page", "blog-post", "web-page"]},
         {name: "Page-Code", values: ["${code}"]}
       ]
     ) {

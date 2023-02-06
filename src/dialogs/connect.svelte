@@ -24,7 +24,8 @@
 
   async function arwallet() {
     const wallet = new ArweaveWebWallet({
-      name: "img",
+      name: "stamps",
+      url: window.location.href,
     });
     wallet.setUrl("arweave.app");
     await wallet.connect();

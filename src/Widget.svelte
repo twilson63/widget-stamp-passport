@@ -1,19 +1,12 @@
 <script>
-  import {
-    getStamps,
-    getAsset,
-    getStampCount,
-    hasStamped,
-    stamp,
-    checkVouched,
-  } from "./lib/passport.js";
+  import { getStampCount, hasStamped, stamp } from "./lib/passport.js";
   import Modal from "./components/modal.svelte";
   import Logo from "./components/logo.svelte";
   import Connect from "./dialogs/connect.svelte";
 
   export let asset = null;
-  export let code = null;
-  export let author = null;
+  // export let code = null;
+  // export let author = null;
 
   let url = "https://now.arweave.dev";
 
@@ -21,7 +14,6 @@
   let count = "N/A";
   let alreadyStamped = false;
   let stampingDialog = false;
-  let stamps = [];
   let notVouchedDialog = false;
   let alreadyStampedDialog = false;
   let showConnect = false;
@@ -45,28 +37,34 @@
 
   if (asset) {
     getStampCount(asset).then((c) => (count = c));
-  } else if (author && code) {
-    getAsset(author, code)
-      .then((x) => ((asset = x), x))
+  } else {
+    fetch(window.location.href)
+      .then(
+        (res) =>
+          res.headers.get("x-arns-resolved-id") ||
+          window.location.pathname.split("/")[1]
+      )
+      .then((a) => ((asset = a), a))
+      .then((x) => (console.log("asset:", x), x))
       .then(getStampCount)
       .then((c) => (count = c))
-      .then((_) => (state = CONNECTED_NO_POAP))
-      .catch((e) =>
-        console.log("Could not locate asset using code and author")
-      );
+      .catch((e) => (count = 0))
+      .then(() => {
+        state = NOT_CONNECTED;
+      });
   }
 
-  window.addEventListener("pageTransactionIdLoaded", async () => {
-    asset = window.transactionId;
-    state = CONNECTED_NO_POAP;
-    count = await getStampCount(asset);
-  });
+  // window.addEventListener("pageTransactionIdLoaded", async () => {
+  //   asset = window.transactionId;
+  //   state = CONNECTED_NO_POAP;
+  //   count = await getStampCount(asset);
+  // });
 
   const connected = async () => {
     addr = await arweaveWallet.getActiveAddress();
     // check if POAPED!
     state = CONNECTED_NO_POAP;
-
+    console.log({ addr, asset });
     if (await hasStamped(asset, addr)) {
       state = ALREADY_POAPED;
       alreadyStampedDialog = true;
@@ -94,24 +92,23 @@
       return;
     }
 
-    const vouched = await checkVouched(addr);
-    if (vouched) {
-      if (await hasStamped(asset, addr)) {
-        alreadyStampedDialog = true;
-        return;
-      }
-      stampingDialog = true;
-      await stamp(asset);
-      state = ALREADY_POAPED;
-    } else {
-      notVouchedDialog = true;
-      alreadyStamped = false;
-      state = CONNECTED_NO_POAP;
+    if (await hasStamped(asset, addr)) {
+      alreadyStampedDialog = true;
+      return;
     }
 
-    // need to wait some time here before checking...
-    count = await getStampCount(asset);
-    stampingDialog = false;
+    stampingDialog = true;
+    try {
+      await stamp(asset);
+      state = ALREADY_POAPED;
+
+      // need to wait some time here before checking...
+      count = await getStampCount(asset);
+      stampingDialog = false;
+    } catch (e) {
+      state = ALREADY_POAPED;
+      stampingDialog = false;
+    }
   }
 
   function changeTab(tab) {
@@ -136,7 +133,7 @@
       {:else if equals(state, NOT_CONNECTED)}
         <div class="stat-value text-center">{count}</div>
         <div class="stat-desc">Not Connected</div>
-        <button class="mt-4 btn btn-sm" disabled={true}>Stamp</button>
+        <button class="mt-4 btn btn-sm" on:click={doStamp}>Stamp</button>
         <a href={url} target="_blank" class="mt-4 btn btn-sm btn-info"
           >Whats Hot</a
         >

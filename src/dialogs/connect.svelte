@@ -44,7 +44,7 @@
   cancel={true}
   on:cancel={() => (open = false)}
 >
-  <div class="px-[36px] py-[24px] flex flex-col space-y-8">
+  <div data-theme="light" class="px-[36px] py-[24px] flex flex-col space-y-8">
     <svg
       width="55"
       height="55"
@@ -72,7 +72,7 @@
       </defs>
     </svg>
     <h2 class="text-2xl font-bold text-[#160042]">
-      Arweave wallet needed to post
+      Connect with an Arweave Wallet to Stamp
     </h2>
     <p class="text-xl  text-[#160042]">Select your preferred wallet below:</p>
     <button
@@ -84,15 +84,12 @@
       class="btn btn-block rounded-full bg-[#E4E6F1] text-black hover:bg-gray-400"
       >Arweave.app</button
     >
-    <!--
-    <button
-      on:click={() => {
-        dispatch("help");
-        open = false;
-      }}
-      class="link no-underline text-center  text-[#160042]"
-      >I don't have a wallet</button
+
+    <a
+      href="https://arweave.app/add"
+      target="_blank"
+      class="link no-underline text-center text-[#160042]"
+      >I don't have a wallet</a
     >
-    -->
   </div>
 </Modal>

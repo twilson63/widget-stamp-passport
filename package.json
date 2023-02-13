@@ -22,8 +22,9 @@
     "w3": "^2.0.2"
   },
   "dependencies": {
-    "@permaweb/stampjs": "https://js_stamps.g8way.io",
+    "@permaweb/stampjs": "https://stampjs-v006_stamps.g8way.io",
     "arweave-wallet-connector": "^0.0.31",
-    "ramda": "^0.28.0"
+    "ramda": "^0.28.0",
+    "warp-contracts": "^1.2.52"
   }
 }

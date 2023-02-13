@@ -2,7 +2,7 @@
   import Connect from "./dialogs/connect.svelte";
   import { onMount } from "svelte";
   import { getStampCount, hasStamped, stamp } from "./lib/passport.js";
-
+  import StampButton from "./components/stamp-button.svelte";
   export let asset = null;
 
   let showConnect = false;
@@ -11,7 +11,7 @@
     vouched: 0,
     super: 0,
   };
-  let origin = 0;
+  let origin = 100;
 
   onMount(async () => {
     if (!asset) {
@@ -44,7 +44,13 @@
   }
 </script>
 
-<div class="p-8 flex space-x-[1px] items-center">
+<div class="flex justify-center">
+  <StampButton />
+</div>
+
+<div
+  class="pr-8 pl-4 pt-2 pb-8 flex space-x-[4px] items-center justify-center w-full"
+>
   <div class="tooltip" data-tip="Total Stamps">
     <div
       on:click={doStamp}

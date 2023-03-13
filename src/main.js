@@ -1,4 +1,4 @@
-import Widget from './Widget.svelte'
+import Widget from './Widget2.svelte'
 
 const el = document.getElementById('passport')
 const dataset = Object.assign({}, el.dataset)

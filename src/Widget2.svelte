@@ -1,11 +1,14 @@
 <script>
   import Connect from "./dialogs/connect.svelte";
+  import Modal from "./components/modal.svelte";
   import { onMount } from "svelte";
   import { getStampCount, hasStamped, stamp } from "./lib/passport.js";
   import StampButton from "./components/stamp-button.svelte";
   export let asset = null;
 
   let showConnect = false;
+  let stampingDialog = false;
+  let alreadyStampedDialog = false;
   let count = {
     total: 0,
     vouched: 0,
@@ -31,8 +34,27 @@
 
   async function doStamp() {
     if (window.arweaveWallet) {
-      await stamp(asset);
-      count = await getStampCount(asset);
+      await window.arweaveWallet.connect([
+        "ACCESS_ADDRESS",
+        "SIGN_TRANSACTION",
+      ]);
+      const stamped = await hasStamped(
+        asset,
+        await window.arweaveWallet.getActiveAddress()
+      );
+      if (stamped) {
+        alreadyStampedDialog = true;
+        return;
+      }
+      stampingDialog = true;
+      try {
+        await stamp(asset);
+        stampingDialog = false;
+        count = await getStampCount(asset);
+      } catch (e) {
+        stampingDialog = false;
+        alert("ERROR: ", e.message);
+      }
     } else {
       showConnect = true;
     }
@@ -45,7 +67,7 @@
 </script>
 
 <div class="flex justify-center">
-  <StampButton />
+  <StampButton on:click={doStamp} />
 </div>
 
 <div
@@ -120,7 +142,8 @@
     </div>
   </div>
   <span class="text-sm mr-8">{count.vouched}</span>
-  <div class="tooltip" data-tip="Super Stamps">
+
+  <!-- <div class="tooltip" data-tip="Super Stamps">
     <div
       class="btn btn-ghost btn-sm btn-circle flex items-center justify-center"
     >
@@ -140,7 +163,7 @@
       </svg>
     </div>
   </div>
-  <span class="text-sm">{count.super}</span>
+  <span class="text-sm">{count.super}</span> -->
   <div class="tooltip" data-tip="Origin Count">
     <div class="py-4 pl-2 pr-1">
       <div class="h-4">
@@ -169,3 +192,24 @@
   <span class="text-sm">{origin}</span>
 </div>
 <Connect bind:open={showConnect} on:connected={connected} />
+<Modal
+  bind:open={stampingDialog}
+  ok={false}
+  cancel={false}
+  bgColor="bg-[#f2f3f4]"
+>
+  <img
+    class="w-full grid items-center"
+    src="https://arweave.net/IkMJRqi_0Xx_QhstK4WE3rsQqQxC07n84UagPgqGXfc"
+    alt="stamping"
+  />
+  <h3 class="text-lg text-center">Stamping Passport</h3>
+</Modal>
+<Modal
+  bind:open={alreadyStampedDialog}
+  on:cancel={() => (alreadyStampedDialog = false)}
+  bgColor="bg-[#f2f3f4]"
+>
+  <h3 class="text-2xl font-bold">Already Stamped</h3>
+  <p class="my-8 text-lg">Looks like you have already stamped this page!</p>
+</Modal>

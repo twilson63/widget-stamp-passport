@@ -1,4 +1,4 @@
-<button class="btn-2 w-4/5">STAMP</button>
+<button class="btn-2 w-4/5" on:click>STAMP</button>
 
 <style>
 	@import url("https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300&display=swap");

@@ -164,7 +164,7 @@
     </div>
   </div>
   <span class="text-sm">{count.super}</span> -->
-  <div class="tooltip" data-tip="Origin Count">
+  <!-- <div class="tooltip" data-tip="Origin Count">
     <div class="py-4 pl-2 pr-1">
       <div class="h-4">
         <svg
@@ -189,7 +189,7 @@
       </div>
     </div>
   </div>
-  <span class="text-sm">{origin}</span>
+  <span class="text-sm">{origin}</span> -->
 </div>
 <Connect bind:open={showConnect} on:connected={connected} />
 <Modal
@@ -203,7 +203,7 @@
     src="https://arweave.net/IkMJRqi_0Xx_QhstK4WE3rsQqQxC07n84UagPgqGXfc"
     alt="stamping"
   />
-  <h3 class="text-lg text-center">Stamping Passport</h3>
+  <h3 class="text-lg text-center">Stamping Asset</h3>
 </Modal>
 <Modal
   bind:open={alreadyStampedDialog}
@@ -211,5 +211,5 @@
   bgColor="bg-[#f2f3f4]"
 >
   <h3 class="text-2xl font-bold">Already Stamped</h3>
-  <p class="my-8 text-lg">Looks like you have already stamped this page!</p>
+  <p class="my-8 text-lg">Looks like you have already stamped this asset!</p>
 </Modal>

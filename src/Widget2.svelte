@@ -61,8 +61,14 @@
   }
   async function connected() {
     showConnect = false;
-    await stamp(asset);
-    count = await getStampCount(asset);
+    stampingDialog = true;
+    try {
+      await stamp(asset);
+      count = await getStampCount(asset);
+      stampingDialog = false;
+    } catch (e) {
+      stampingDialog = false;
+    }
   }
 </script>
 

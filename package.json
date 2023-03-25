@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "0.0.21",
+  "version": "0.0.23",
   "description": "Stamp Widget",
   "main": "dist/widget.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "w3": "^2.0.2"
   },
   "dependencies": {
-    "@permaweb/stampjs": "^0.0.14",
+    "@permaweb/stampjs": "^0.0.15",
     "arweave-wallet-connector": "^0.0.31",
     "ramda": "^0.28.0",
     "warp-contracts": "^1.2.52"
